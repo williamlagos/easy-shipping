@@ -16,13 +16,13 @@ Including another URLconf
 from django.conf.urls import url
 from django.views.generic import TemplateView, RedirectView
 from kombi.views import IndexView, RegisterView
-# from kombi.api import DeliveryResource
+from kombi.api import DeliveryResource
 
 urlpatterns = [
     url(r'^$', IndexView.as_view(), name="index"),
     url(r'^register/$', RegisterView.as_view(), name='login'),
     url(r'^signin/$', RedirectView.as_view(url="/"), name='signin'),
     url(r'^login/$', TemplateView.as_view(template_name="login.html"), name='login'),
-    # url(r'kombi/deliveries$', DeliveryResource.as_list(), name="kombi_deliveries"),
-    # url(r'kombi/deliveries/(?P<pk>\d+)$', DeliveryResource.as_detail(), name="kombi_delivery"),
+    url(r'deliveries$', DeliveryResource.as_list(), name="kombi_deliveries"),
+    url(r'deliveries/(?P<pk>\d+)$', DeliveryResource.as_detail(), name="kombi_delivery"),
 ]
