@@ -5,8 +5,9 @@ dj-database-url==0.4.1
 django-crispy-forms==1.6.1
 restless==2.1.1
 packaging==16.8
-psycopg2==2.6.2
 pyparsing==2.2.0
 pytz==2017.2
 six==1.10.0
+restless==2.0.4
+psycopg2==2.7.1
 whitenoise==3.2
