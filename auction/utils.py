@@ -1,4 +1,4 @@
-from lebay.apps.lebay.constants import AUCTION_ITEM_STATUS_SOLD, AUCTION_ITEM_STATUS_EXPIRED
+from constants import AUCTION_ITEM_STATUS_SOLD, AUCTION_ITEM_STATUS_EXPIRED
 
 def process_ended_auction(auction_event):
     bid_count = auction_event.bids.count()
