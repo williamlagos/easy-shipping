@@ -22,7 +22,7 @@ urlpatterns = [
     # url(r'^register/$', RegisterView.as_view(), name='login'),
     # url(r'^signin/$', RedirectView.as_view(url="/"), name='signin'),
     url(r'^$', TemplateView.as_view(template_name="login.html"), name='login'),
-    url(r'^boxer/', include('boxer.urls')),
+    url(r'^start/', include('boxer.urls')),
 
     # url(r'^$', lebay_views.index, name='lebay_index'),
     # url(r'^home/$', lebay_views.view_user_home, name='lebay_user_home'),

@@ -3,7 +3,7 @@ from django.shortcuts import redirect
 from boxer.models import Freighter
 
 class SputnikView(TemplateView):
-    template_name = "index.html"
+    template_name = "landing.html"
     def post(self,request):
         values = request.POST.dict()
         del values['csrfmiddlewaretoken']
