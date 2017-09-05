@@ -21,7 +21,7 @@ urlpatterns = [
     # url(r'^$', IndexView.as_view(), name="index"),
     # url(r'^register/$', RegisterView.as_view(), name='login'),
     # url(r'^signin/$', RedirectView.as_view(url="/"), name='signin'),
-    # url(r'^login/$', TemplateView.as_view(template_name="login.html"), name='login'),
+    url(r'^$', TemplateView.as_view(template_name="login.html"), name='login'),
     url(r'^boxer/', include('boxer.urls')),
 
     # url(r'^$', lebay_views.index, name='lebay_index'),

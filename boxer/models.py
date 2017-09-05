@@ -191,9 +191,11 @@ class Delivery(models.Model):
 
 class Freighter(models.Model):
     """ Main freighter model """
-    name = models.CharField(max_length=256)
-    code = models.CharField(max_length=128)
+    name = models.CharField(max_length=128)
+    email = models.EmailField()
     phone = models.CharField(max_length=64)
+    region = models.CharField(max_length=64)
+    text = models.TextField()
 
 admin.site.register(AuctionEvent)
 admin.site.register(Bid)
