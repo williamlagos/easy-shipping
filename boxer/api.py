@@ -3,7 +3,7 @@
 from datetime import datetime
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
-from kombi.models import Delivery
+from boxer.models import Delivery
 
 class DeliveryResource(DjangoResource):
     """ Prepares the Delivery Model as API Resource """
