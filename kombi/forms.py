@@ -1,10 +1,10 @@
 from django.forms import ModelForm
-from kombi.models import Freighter
+from boxer.models import Freighter
 
 class RegisterForm(ModelForm):
     class Meta:
         model = Freighter
-        fields = ['name','code','phone']
+        fields = ['name','phone']
 
 # import datetime
 # from decimal import Decimal
