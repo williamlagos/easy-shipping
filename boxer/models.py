@@ -2,7 +2,7 @@ import datetime
 from decimal import Decimal
 
 from django.contrib import admin
-from django.contrib.auth.models import User as DjangoUser
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from localflavor.us.models import USStateField, PhoneNumberField
@@ -23,24 +23,6 @@ class BaseModel(models.Model):
 
     class Meta:
         abstract = True
-
-class User(DjangoUser):
-    address_line_1 = models.CharField(max_length=100)
-    address_line_2 = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=50)
-    state = USStateField()
-    zipcode = models.CharField(max_length=10)
-    phone = PhoneNumberField()
-
-    def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
-
-    def is_seller(self):
-        try:
-            seller = self.seller
-            return True
-        except ObjectDoesNotExist, e:
-            return False
 
 class ItemCategory(BaseModel):
     title = models.CharField(max_length=100)
@@ -173,6 +155,35 @@ class Bid(BaseModel):
 
 from django.db import models
 
+class Client(User):
+    address_line_1 = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=50)
+    state = USStateField()
+    zipcode = models.CharField(max_length=10)
+    phone = PhoneNumberField()
+    ranking = models.IntegerField()
+
+    def __unicode__(self):
+        return u'%s %s' % (self.first_name, self.last_name)
+
+    def is_seller(self):
+        try:
+            seller = self.seller
+            return True
+        except ObjectDoesNotExist, e:
+            return False
+
+class Freighter(models.Model):
+    """ Main freighter model """
+    name = models.CharField(max_length=128)
+    email = models.EmailField()
+    logo = models.ImageField()
+    phone = models.CharField(max_length=64)
+    region = models.CharField(max_length=64)
+    description = models.TextField()
+    ranking = models.IntegerField()
+
 class Delivery(models.Model):
     """ Main delivery model """
     freighter = models.IntegerField(default=models.NOT_PROVIDED)
@@ -188,14 +199,6 @@ class Delivery(models.Model):
     #     pass
     def __str__(self):
         return self.title
-
-class Freighter(models.Model):
-    """ Main freighter model """
-    name = models.CharField(max_length=128)
-    email = models.EmailField()
-    phone = models.CharField(max_length=64)
-    region = models.CharField(max_length=64)
-    text = models.TextField()
 
 admin.site.register(AuctionEvent)
 admin.site.register(Bid)
