@@ -13,70 +13,82 @@ import datetime
 from django.db import models
 
 class BaseModel(models.Model):
-    is_active = models.BooleanField(default=True)
-    time_created = models.DateTimeField(default=datetime.datetime.now)
-    time_modified = models.DateTimeField(default=datetime.datetime.now)
+    active = models.BooleanField(default=True)
+    created = models.DateTimeField(default=datetime.datetime.now)
+    modified = models.DateTimeField(default=datetime.datetime.now)
 
     def save(self, force_insert=False, force_update=False):
-        self.time_modified = datetime.datetime.now()
+        self.modified = datetime.datetime.now()
         super(BaseModel, self).save(force_insert=False, force_update=False)
 
     class Meta:
         abstract = True
 
-class ItemCategory(BaseModel):
-    title = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
-    parent = models.ForeignKey('self', blank=True, null=True)
+""" Models for application project """
+
+from django.db import models
+
+class Client(User):
+    address_line_1 = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100, blank=True)
+    city = models.CharField(max_length=50)
+    state = USStateField()
+    zipcode = models.CharField(max_length=10)
+    phone = PhoneNumberField()
+    ranking = models.IntegerField()
 
     def __unicode__(self):
-        return u'%s' % self.title
+        return u'%s %s' % (self.first_name, self.last_name)
 
-class Seller(BaseModel):
-    user = models.OneToOneField(User, related_name='seller')
-    paypal_email = models.EmailField()
-    default_shipping_method = models.IntegerField(choices=AUCTION_EVENT_SHIPPING_CHOICES, default=AUCTION_EVENT_SHIPPING_USPS)
-    default_shipping_detail = models.CharField(max_length=100, blank=True, null=True)
-    default_payment_detail = models.CharField(max_length=200, blank=True, null=True)
+    def is_seller(self):
+        try:
+            seller = self.seller
+            return True
+        except ObjectDoesNotExist, e:
+            return False
+
+class Freighter(User):
+    """ Main freighter model """
+    logo = models.ImageField()
+    phone = PhoneNumberField()
+    region = models.CharField(max_length=64)
+    description = models.TextField()
+    ranking = models.IntegerField()
+
+class Delivery(BaseModel):
+    """ Main delivery model """
+    freighter = models.IntegerField(default=models.NOT_PROVIDED)
+    departure_lat = models.FloatField()
+    departure_lon = models.FloatField()
+    arrival_lat = models.FloatField()
+    arrival_lon = models.FloatField()
+    deadline = models.DateTimeField(auto_now=True)
+    volume = models.FloatField(default=models.NOT_PROVIDED)
+    weight = models.FloatField(default=models.NOT_PROVIDED)
+    image = models.ImageField(max_length=128)
+    title = models.CharField(max_length=128)
+    description = models.TextField(default='', blank=True)
+    client = models.ForeignKey(User, related_name='id')
+    value = models.FloatField()
+    auction = models.BooleanField()
+    def __str__(self):
+        return self.title
+
+class Offer(BaseModel):
+    auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
+    bidder = models.ForeignKey(User, related_name='bids')
+    delivery = models.ForeignKey(Delivery, related_name='id')
+    amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
 
     def __unicode__(self):
-        return u'Seller profile of %s' % self.user.username
+        return u'Placed on %s by %s' % (self.auction_event.item.title, self.bidder.username)
 
-class Item(BaseModel):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    condition = models.IntegerField(choices=AUCTION_ITEM_CONDITION_CHOICES)
-    seller = models.ForeignKey(User, related_name='auction_items')
-    category = models.ForeignKey(ItemCategory, related_name='auction_items')
-    status = models.IntegerField(choices=AUCTION_ITEM_STATUS_CHOICES, default=AUCTION_ITEM_STATUS_IDLE)
-
-    def __unicode__(self):
-        return u'%s' % self.title
-
-    def get_condition(self):
-        return dict(AUCTION_ITEM_CONDITION_CHOICES).get(self.condition, 'N/A')
-
-    def get_status(self):
-        return dict(AUCTION_ITEM_STATUS_CHOICES).get(self.status, 'N/A')
-
-class AuctionEventManager(models.Manager):
-    def get_current_auctions(self):
-        current_time = datetime.datetime.now()
-        return self.filter(item__status=AUCTION_ITEM_STATUS_RUNNING, start_time__lt=current_time, end_time__gt=current_time)
-
-class AuctionEvent(BaseModel):
-    item = models.ForeignKey(Item, related_name='auction_events')
-    shipping_method = models.IntegerField(choices=AUCTION_EVENT_SHIPPING_CHOICES)
-    shipping_detail = models.CharField(max_length=100, blank=True)
+class Schedule(BaseModel):
+    delivery = models.ForeignKey(Delivery, related_name='auction_events')
+    schedule_detail = models.CharField(max_length=100, blank=True)
     payment_detail = models.CharField(max_length=200, blank=True)
     start_time = models.DateTimeField(help_text=u'Format (Hour & Minute are optional): 10/25/2006 14:30')
     end_time = models.DateTimeField(help_text=u'Format (Hour & Minute are optional): 10/25/2006 14:30')
-    starting_price = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2)
-    shipping_fee = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2)
-    reserve_price = models.DecimalField(default=Decimal('0.00'), blank=True, max_digits=5, decimal_places=2)
-    winning_bidder = models.ForeignKey(User, related_name='won_auctions', blank=True, null=True)
-
-    objects = AuctionEventManager()
 
     def __unicode__(self):
         return u'%s listed on %s' % (self.item.title, self.start_time)
@@ -135,70 +147,53 @@ class AuctionEvent(BaseModel):
         else:
             return 'Unpaid'
 
-class Sales(BaseModel):
-    auction_event = models.ForeignKey(AuctionEvent, related_name='sales')
-    payment_status = models.IntegerField(choices=SALES_PAYMENT_STATUS_CHOICES, default=SALES_PAYMENT_STATUS_PROCESSING)
-    invoice_number = models.CharField(max_length=200, unique=True)
+class Picture(BaseModel):
+    user = models.ForeignKey(User, related_name='picture')
+    image = models.ImageField()
+    delivery_code = models.CharField(max_length=128)
 
     def __unicode__(self):
-        return u'Invoice for %s' % self.auction_event
+        return u'%s' % self.title
 
-class Bid(BaseModel):
-    auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
-    bidder = models.ForeignKey(User, related_name='bids')
-    amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
-
-    def __unicode__(self):
-        return u'Placed on %s by %s' % (self.auction_event.item.title, self.bidder.username)
-
-""" Models for application project """
-
-from django.db import models
-
-class Client(User):
-    address_line_1 = models.CharField(max_length=100)
-    address_line_2 = models.CharField(max_length=100, blank=True)
-    city = models.CharField(max_length=50)
-    state = USStateField()
-    zipcode = models.CharField(max_length=10)
-    phone = PhoneNumberField()
-    ranking = models.IntegerField()
-
-    def __unicode__(self):
-        return u'%s %s' % (self.first_name, self.last_name)
-
-    def is_seller(self):
-        try:
-            seller = self.seller
-            return True
-        except ObjectDoesNotExist, e:
-            return False
-
-class Freighter(models.Model):
-    """ Main freighter model """
-    name = models.CharField(max_length=128)
-    email = models.EmailField()
-    logo = models.ImageField()
-    phone = models.CharField(max_length=64)
-    region = models.CharField(max_length=64)
-    description = models.TextField()
-    ranking = models.IntegerField()
-
-class Delivery(models.Model):
-    """ Main delivery model """
-    freighter = models.IntegerField(default=models.NOT_PROVIDED)
-    departure = models.CharField(max_length=256)
-    arrival = models.CharField(max_length=256)
-    deadline = models.DateTimeField(auto_now=True)
-    volume = models.FloatField(default=models.NOT_PROVIDED)
-    weight = models.FloatField(default=models.NOT_PROVIDED)
-    image = models.ImageField(max_length=128)
-    title = models.CharField(max_length=128)
-    description = models.TextField(default='', blank=True)
-    # def __unicode__(self):
-    #     pass
-    def __str__(self):
-        return self.title
+# class Seller(BaseModel):
+#     user = models.OneToOneField(User, related_name='seller')
+#     paypal_email = models.EmailField()
+#     default_shipping_method = models.IntegerField(choices=AUCTION_EVENT_SHIPPING_CHOICES, default=AUCTION_EVENT_SHIPPING_USPS)
+#     default_shipping_detail = models.CharField(max_length=100, blank=True, null=True)
+#     default_payment_detail = models.CharField(max_length=200, blank=True, null=True)
+#
+#     def __unicode__(self):
+#         return u'Seller profile of %s' % self.user.username
+#
+# class Item(BaseModel):
+#     title = models.CharField(max_length=200)
+#     description = models.TextField(blank=True)
+#     condition = models.IntegerField(choices=AUCTION_ITEM_CONDITION_CHOICES)
+#     seller = models.ForeignKey(User, related_name='auction_items')
+#     category = models.ForeignKey(ItemCategory, related_name='auction_items')
+#     status = models.IntegerField(choices=AUCTION_ITEM_STATUS_CHOICES, default=AUCTION_ITEM_STATUS_IDLE)
+#
+#     def __unicode__(self):
+#         return u'%s' % self.title
+#
+#     def get_condition(self):
+#         return dict(AUCTION_ITEM_CONDITION_CHOICES).get(self.condition, 'N/A')
+#
+#     def get_status(self):
+#         return dict(AUCTION_ITEM_STATUS_CHOICES).get(self.status, 'N/A')
+#
+# class AuctionEventManager(models.Manager):
+#     def get_current_auctions(self):
+#         current_time = datetime.datetime.now()
+#         return self.filter(item__status=AUCTION_ITEM_STATUS_RUNNING, start_time__lt=current_time, end_time__gt=current_time)
+#
+# class Sales(BaseModel):
+#     auction_event = models.ForeignKey(AuctionEvent, related_name='sales')
+#     payment_status = models.IntegerField(choices=SALES_PAYMENT_STATUS_CHOICES, default=SALES_PAYMENT_STATUS_PROCESSING)
+#     invoice_number = models.CharField(max_length=200, unique=True)
+#
+#     def __unicode__(self):
+#         return u'Invoice for %s' % self.auction_event
 
 admin.site.register(AuctionEvent)
 admin.site.register(Bid)
