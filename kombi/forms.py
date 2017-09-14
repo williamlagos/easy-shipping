@@ -4,7 +4,7 @@ from boxer.models import Freighter
 class RegisterForm(ModelForm):
     class Meta:
         model = Freighter
-        fields = ['name','phone']
+        fields = ['phone']
 
 # import datetime
 # from decimal import Decimal

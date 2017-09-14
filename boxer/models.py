@@ -28,14 +28,18 @@ class BaseModel(models.Model):
 
 from django.db import models
 
-class Client(User):
+class Profile(User):
     address_line_1 = models.CharField(max_length=100)
     address_line_2 = models.CharField(max_length=100, blank=True)
     city = models.CharField(max_length=50)
     state = USStateField()
+    region = models.CharField(max_length=64)
     zipcode = models.CharField(max_length=10)
     phone = PhoneNumberField()
     ranking = models.IntegerField()
+    description = models.TextField()
+    logo = models.ImageField()
+    side = models.IntegerField()
 
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
@@ -47,17 +51,9 @@ class Client(User):
         except ObjectDoesNotExist, e:
             return False
 
-class Freighter(User):
-    """ Main freighter model """
-    logo = models.ImageField()
-    phone = PhoneNumberField()
-    region = models.CharField(max_length=64)
-    description = models.TextField()
-    ranking = models.IntegerField()
-
 class Delivery(BaseModel):
     """ Main delivery model """
-    freighter = models.IntegerField(default=models.NOT_PROVIDED)
+    freighter = models.ForeignKey(User)
     departure_lat = models.FloatField()
     departure_lon = models.FloatField()
     arrival_lat = models.FloatField()
@@ -68,14 +64,14 @@ class Delivery(BaseModel):
     image = models.ImageField(max_length=128)
     title = models.CharField(max_length=128)
     description = models.TextField(default='', blank=True)
-    client = models.ForeignKey(User, related_name='id')
+    client = models.ForeignKey(User)
     value = models.FloatField()
-    auction = models.BooleanField()
+    in_auction = models.BooleanField()
     def __str__(self):
         return self.title
 
 class Offer(BaseModel):
-    auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
+    # auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
     bidder = models.ForeignKey(User, related_name='bids')
     delivery = models.ForeignKey(Delivery, related_name='id')
     amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
@@ -195,10 +191,10 @@ class Picture(BaseModel):
 #     def __unicode__(self):
 #         return u'Invoice for %s' % self.auction_event
 
-admin.site.register(AuctionEvent)
-admin.site.register(Bid)
-admin.site.register(Item)
-admin.site.register(ItemCategory)
-admin.site.register(Seller)
-admin.site.register(Sales)
-admin.site.register(User)
+# admin.site.register(AuctionEvent)
+# admin.site.register(Bid)
+# admin.site.register(Item)
+# admin.site.register(ItemCategory)
+# admin.site.register(Seller)
+# admin.site.register(Sales)
+# admin.site.register(User)
