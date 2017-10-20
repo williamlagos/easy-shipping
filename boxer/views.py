@@ -1,6 +1,6 @@
 from django.views.generic.base import TemplateView
 from django.shortcuts import redirect
-from boxer.models import Freighter
+from boxer.models import Profile
 
 class SputnikView(TemplateView):
     template_name = "landing.html"

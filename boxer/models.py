@@ -53,7 +53,7 @@ class Profile(User):
 
 class Delivery(BaseModel):
     """ Main delivery model """
-    freighter = models.ForeignKey(User)
+    freighter = models.ForeignKey(User, related_name="delivery_freighter")
     departure_lat = models.FloatField()
     departure_lon = models.FloatField()
     arrival_lat = models.FloatField()
@@ -64,7 +64,7 @@ class Delivery(BaseModel):
     image = models.ImageField(max_length=128)
     title = models.CharField(max_length=128)
     description = models.TextField(default='', blank=True)
-    client = models.ForeignKey(User)
+    client = models.ForeignKey(User, related_name="delivery_client")
     value = models.FloatField()
     in_auction = models.BooleanField()
     def __str__(self):
@@ -72,8 +72,8 @@ class Delivery(BaseModel):
 
 class Offer(BaseModel):
     # auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
-    bidder = models.ForeignKey(User, related_name='bids')
-    delivery = models.ForeignKey(Delivery, related_name='id')
+    bidder = models.ForeignKey(User, related_name='offer_bidder')
+    delivery = models.ForeignKey(Delivery, related_name='offer_delivery')
     amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
 
     def __unicode__(self):

@@ -1,9 +1,9 @@
 from django.forms import ModelForm
-from boxer.models import Freighter
+from boxer.models import Profile
 
 class RegisterForm(ModelForm):
     class Meta:
-        model = Freighter
+        model = Profile
         fields = ['phone']
 
 # import datetime

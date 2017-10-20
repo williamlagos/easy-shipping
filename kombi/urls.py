@@ -16,13 +16,15 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.generic import TemplateView, RedirectView
 from kombi.views import IndexView, RegisterView
+from boxer.views import SputnikView
 
 urlpatterns = [
     # url(r'^$', IndexView.as_view(), name="index"),
     # url(r'^register/$', RegisterView.as_view(), name='login'),
     # url(r'^signin/$', RedirectView.as_view(url="/"), name='signin'),
-    url(r'^$', TemplateView.as_view(template_name="login.html"), name='login'),
-    url(r'^start/', include('boxer.urls')),
+    # url(r'^$', TemplateView.as_view(template_name="login.html"), name='login'),
+    url(r'^api/', include('boxer.urls')),
+    url(r'^$', SputnikView.as_view())
 
     # url(r'^$', lebay_views.index, name='lebay_index'),
     # url(r'^home/$', lebay_views.view_user_home, name='lebay_user_home'),
