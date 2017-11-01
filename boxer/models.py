@@ -54,19 +54,19 @@ class Profile(User):
 class Delivery(BaseModel):
     """ Main delivery model """
     freighter = models.ForeignKey(User, related_name="delivery_freighter")
-    departure_lat = models.FloatField()
-    departure_lon = models.FloatField()
-    arrival_lat = models.FloatField()
-    arrival_lon = models.FloatField()
+    departure_lat = models.FloatField(default=0.0)
+    departure_lon = models.FloatField(default=0.0)
+    arrival_lat = models.FloatField(default=0.0)
+    arrival_lon = models.FloatField(default=0.0)
     deadline = models.DateTimeField(auto_now=True)
     volume = models.FloatField(default=models.NOT_PROVIDED)
     weight = models.FloatField(default=models.NOT_PROVIDED)
     image = models.ImageField(max_length=128)
     title = models.CharField(max_length=128)
     description = models.TextField(default='', blank=True)
-    client = models.ForeignKey(User, related_name="delivery_client")
-    value = models.FloatField()
-    in_auction = models.BooleanField()
+    client = models.ForeignKey(User, related_name="delivery_client", null=True)
+    value = models.FloatField(default=0.0)
+    in_auction = models.BooleanField(default=True)
     def __str__(self):
         return self.title
 
