@@ -3,7 +3,44 @@
 from datetime import datetime
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
-from boxer.models import Delivery
+from django.http import HttpResponse
+from boxer.models import Delivery,Profile
+
+class FreighterResource(DjangoResource):
+    def list(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def create(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def delete(self, pk, **kwargs):
+        pass
+
+class ClientResource(DjangoResource):
+    def list(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def create(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def delete(self, pk, **kwargs):
+        pass
+
+class ScheduleResource(DjangoResource):
+    def list(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def create(self):
+        pass
+    def detail(self, pk, **kwargs):
+        pass
+    def delete(self, pk, **kwargs):
+        pass
 
 class DeliveryResource(DjangoResource):
     """ Prepares the Delivery Model as API Resource """
@@ -91,3 +128,11 @@ class DeliveryResource(DjangoResource):
     # DELETE /kombi/deliveries/<pk>/
     def delete(self, pk, **kwargs):
         Delivery.objects.get(id=pk).delete()
+
+    @classmethod
+    def offers(self, *args, **kwargs):
+        return HttpResponse('')
+
+    @classmethod
+    def pictures(self, *args, **kwargs):
+        return HttpResponse('')

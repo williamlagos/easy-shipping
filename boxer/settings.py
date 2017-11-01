@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'boxer',
-    'kombi'
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -56,7 +55,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'kombi.urls'
+ROOT_URLCONF = 'boxer.urls'
 
 TEMPLATES = [
     {
@@ -76,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'kombi.wsgi.application'
+WSGI_APPLICATION = 'boxer.wsgi.application'
 
 
 # Database
@@ -85,7 +84,7 @@ WSGI_APPLICATION = 'kombi.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE':'django.db.backends.sqlite3',
-        'NAME':'kombi.db'
+        'NAME':'boxer.db'
     }
 }
 
