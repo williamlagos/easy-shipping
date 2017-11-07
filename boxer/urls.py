@@ -17,7 +17,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.generic import TemplateView, RedirectView
 from django.contrib import admin
-from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource
+from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource
 from boxer.views import SputnikView, ThanksPageView, IndexView, RegisterView
 
 urlpatterns = [
@@ -25,9 +25,7 @@ urlpatterns = [
     url(r'^dashboard/', admin.site.urls),
     url(r'^thanks/', ThanksPageView.as_view(), name='advantages'),
 
-    url(r'^deliveries', include(DeliveryResource.urls()), name='deliveries'),
-    url(r'^deliveries/(?P<pk>\d+)/offers', DeliveryResource.offers, name='delivery_offers'),
-    url(r'^deliveries/(?P<pk>\d+)/pictures', DeliveryResource.pictures, name='delivery_pictures'),
+    url(r'^deliveries/', include(DeliveryResource.urls()), name='deliveries'),
 
     url(r'^clients', include(ClientResource.urls()), name='clients'),
     url(r'^freighters', include(FreighterResource.urls()), name='freighters'),

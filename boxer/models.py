@@ -53,7 +53,7 @@ class Profile(User):
 
 class Delivery(BaseModel):
     """ Main delivery model """
-    freighter = models.ForeignKey(User, related_name="delivery_freighter")
+    freighter = models.ForeignKey(User, related_name="delivery_freighter", null=True)
     departure_lat = models.FloatField(default=0.0)
     departure_lon = models.FloatField(default=0.0)
     arrival_lat = models.FloatField(default=0.0)
@@ -76,8 +76,8 @@ class Offer(BaseModel):
     delivery = models.ForeignKey(Delivery, related_name='offer_delivery')
     amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
 
-    def __unicode__(self):
-        return u'Placed on %s by %s' % (self.auction_event.item.title, self.bidder.username)
+    # def __unicode__(self):
+        # return u'Placed on %s by %s' % (self.auction_event.item.title, self.bidder.username)
 
 class Schedule(BaseModel):
     delivery = models.ForeignKey(Delivery, related_name='auction_events')
@@ -144,9 +144,9 @@ class Schedule(BaseModel):
             return 'Unpaid'
 
 class Picture(BaseModel):
-    user = models.ForeignKey(User, related_name='picture')
+    delivery = models.ForeignKey(Delivery, related_name='delivery')
+    owner = models.ForeignKey(User, related_name='picture')
     image = models.ImageField()
-    delivery_code = models.CharField(max_length=128)
 
     def __unicode__(self):
         return u'%s' % self.title
