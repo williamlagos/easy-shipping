@@ -7,7 +7,8 @@ class SputnikView(TemplateView):
     def post(self,request):
         values = request.POST.dict()
         del values['csrfmiddlewaretoken']
-        Freighter.objects.create(**values)
+        values['token'] = Profile.generate_token()
+        Profile.objects.create(**values)
         return redirect('/thanks')
 
 class ThanksPageView(TemplateView):

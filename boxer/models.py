@@ -1,4 +1,4 @@
-import datetime
+import datetime, uuid, hmac, hashlib
 from decimal import Decimal
 
 from django.contrib import admin
@@ -40,6 +40,7 @@ class Profile(User):
     description = models.TextField()
     logo = models.ImageField()
     side = models.IntegerField()
+    token = models.CharField(max_length=40)
 
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
@@ -50,6 +51,12 @@ class Profile(User):
             return True
         except ObjectDoesNotExist, e:
             return False
+
+    @classmethod
+    def generate_token():
+        binary = uuid.uuid4().bytes
+        c = hmac.new(binary, digestmod=hashlib.sha1)
+        return c.hexdigest()
 
 class Delivery(BaseModel):
     """ Main delivery model """

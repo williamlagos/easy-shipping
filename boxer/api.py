@@ -3,6 +3,7 @@
 from datetime import datetime
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
+from restless.exceptions import MethodNotAllowed
 from django.http import HttpResponse
 from django.conf.urls import url
 from django.contrib.auth.models import User
@@ -25,17 +26,12 @@ class BaseResource(DjangoResource):
         # Open everything wide!
         # DANGEROUS, DO NOT DO IN PRODUCTION.
         return True
-        # An OAuth provider will be integrated.
-
-        # Alternatively, if the user is logged into the site...
-        # return self.request.user.is_authenticated()
 
         # Alternatively, you could check an API key. (Need a model for this...)
-        # from myapp.models import ApiKey
         # try:
-        #     key = ApiKey.objects.get(key=self.request.GET.get('api_key'))
+        #     key = Profile.objects.get(token=self.request.GET.get('token'))
         #     return True
-        # except ApiKey.DoesNotExist:
+        # except DoesNotExist:
         #     return False
 
 
@@ -54,10 +50,10 @@ class FreighterResource(BaseResource):
     })
 
     def list(self):
-        return Profile.objects.filter(side=2)
+        return Profile.objects.filter(side=FREIGHTER)
 
     def detail(self, pk, **kwargs):
-        return Profile.objects.get(side=2,id=pk)
+        return Profile.objects.get(side=FREIGHTER,id=pk)
 
     def create(self):
         freighter = Profile(
@@ -70,15 +66,13 @@ class FreighterResource(BaseResource):
             ranking=self.data['ranking'],
             description=self.data['description'],
             logo=self.data['logo'],
-            side=2
+            token=Profile.generate_token(),
+            side=FREIGHTER
         )
         return freighter.save()
 
     def update(self, pk, **kwargs):
-        try:
-            freighter = Profile.objects.get(side=2,id=pk)
-        except Profile.DoesNotExist:
-            freighter = Profile()
+        freighter = Profile.objects.get(side=FREIGHTER,id=pk)
         freighter.address_line_1 = self.data['address'],
         freighter.city = self.data['city'],
         freighter.state = self.data['state'],
@@ -88,11 +82,11 @@ class FreighterResource(BaseResource):
         freighter.ranking = self.data['ranking'],
         freighter.description = self.data['description'],
         freighter.logo = self.data['logo'],
-        freighter.side = 1
+        freighter.side = FREIGHTER
         return freighter.save()
 
     def delete(self, pk, **kwargs):
-        Profile.objects.get(side=2,id=pk)
+        Profile.objects.get(side=FREIGHTER,id=pk)
 
 class ClientResource(BaseResource):
     preparer = FieldsPreparer(fields={
@@ -109,10 +103,10 @@ class ClientResource(BaseResource):
     })
 
     def list(self):
-        return Profile.objects.filter(side=1)
+        return Profile.objects.filter(side=CLIENT)
 
     def detail(self, pk, **kwargs):
-        return Profile.objects.get(side=1,id=pk)
+        return Profile.objects.get(side=CLIENT,id=pk)
 
     def create(self):
         client = Profile(
@@ -125,15 +119,13 @@ class ClientResource(BaseResource):
             ranking=self.data['ranking'],
             description=self.data['description'],
             logo=self.data['logo'],
-            side=1
+            token=Profile.generate_token(),
+            side=CLIENT
         )
         return client.save()
 
     def update(self, pk, **kwargs):
-        try:
-            client = Profile.objects.get(side=1,id=pk)
-        except Profile.DoesNotExist:
-            client = Profile()
+        client = Profile.objects.get(side=CLIENT,id=pk)
         client.address_line_1 = self.data['address'],
         client.city = self.data['city'],
         client.state = self.data['state'],
@@ -143,11 +135,11 @@ class ClientResource(BaseResource):
         client.ranking = self.data['ranking'],
         client.description = self.data['description'],
         client.logo = self.data['logo'],
-        client.side = 1
+        client.side = CLIENT
         return client.save()
 
     def delete(self, pk, **kwargs):
-        Profile.objects.get(side=1,id=pk)
+        Profile.objects.get(side=CLIENT,id=pk)
 
 class ScheduleResource(BaseResource):
     preparer = FieldsPreparer(fields={
