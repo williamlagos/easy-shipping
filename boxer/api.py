@@ -1,5 +1,6 @@
 """ Main application API written in Restless with Django """
 # pylint: disable=no-member
+import re
 from datetime import datetime
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
@@ -23,16 +24,15 @@ class BaseResource(DjangoResource):
 
     def is_authenticated(self):
         """ Verifies authorization of modification of API objects """
-        # Open everything wide!
-        # DANGEROUS, DO NOT DO IN PRODUCTION.
-        return True
+        auth = self.request.META['HTTP_AUTHORIZATION']
+        token, = auth.split()[-1:]
 
         # Alternatively, you could check an API key. (Need a model for this...)
-        # try:
-        #     key = Profile.objects.get(token=self.request.GET.get('token'))
-        #     return True
-        # except DoesNotExist:
-        #     return False
+        try:
+            key = Profile.objects.get(token=token)
+            return True
+        except Profile.DoesNotExist:
+            return False
 
 
 class FreighterResource(BaseResource):

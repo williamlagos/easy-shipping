@@ -40,7 +40,7 @@ class Profile(User):
     description = models.TextField()
     logo = models.ImageField()
     side = models.IntegerField()
-    token = models.CharField(max_length=40)
+    token = models.CharField(max_length=40, null=True)
 
     def __unicode__(self):
         return u'%s %s' % (self.first_name, self.last_name)
@@ -53,7 +53,7 @@ class Profile(User):
             return False
 
     @classmethod
-    def generate_token():
+    def generate_token(cls):
         binary = uuid.uuid4().bytes
         c = hmac.new(binary, digestmod=hashlib.sha1)
         return c.hexdigest()
