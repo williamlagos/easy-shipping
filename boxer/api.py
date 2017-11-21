@@ -1,17 +1,36 @@
 """ Main application API written in Restless with Django """
 # pylint: disable=no-member
-import re
+import re, base64
 from datetime import datetime
 from restless.dj import DjangoResource
 from restless.preparers import FieldsPreparer
 from restless.exceptions import MethodNotAllowed
 from django.http import HttpResponse
 from django.conf.urls import url
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from boxer.models import Delivery,Profile,Offer,Picture,Schedule
 
 CLIENT = 1
 FREIGHTER = 2
+
+class TokensResource(DjangoResource):
+
+    def detail(self):
+        auth = self.request.META['HTTP_AUTHORIZATION'].split()
+        username, password = base64.b64decode(auth[1]).split(':', 1)
+        user = authenticate(username=username, password=password)
+        token = Profile.objects.get(user_ptr_id=user.id).token
+        return {'token': token}
+
+    def is_authenticated(self):
+        if 'HTTP_AUTHORIZATION' in self.request.META:
+            auth = self.request.META['HTTP_AUTHORIZATION'].split()
+            if len(auth) == 2 and auth[0].lower() == "basic":
+                username, password = base64.b64decode(auth[1]).split(':', 1)
+                user = authenticate(username=username, password=password)
+                return user is not None
+        return False
 
 class BaseResource(DjangoResource):
 
@@ -33,7 +52,6 @@ class BaseResource(DjangoResource):
             return True
         except Profile.DoesNotExist:
             return False
-
 
 class FreighterResource(BaseResource):
     preparer = FieldsPreparer(fields={

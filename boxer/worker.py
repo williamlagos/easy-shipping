@@ -1,4 +1,4 @@
-import os
+import os, datetime
 
 from celery import Celery
 from celery.schedules import crontab
@@ -25,12 +25,15 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 from django.contrib.auth.models import User
 
 @app.on_after_configure.connect
-def setup_periodic_tasks(sender, **kwargs):
-    sender.add_periodic_task(10.0, debug_task.s(), name='Every 10s')
+def setup_schedule(sender, **kwargs):
+    sender.add_periodic_task(60.0, process.s(), name='Every 10s')
 
 @app.task(bind=True)
-def debug_task(self):
+def process(self):
     # print(models.Delivery.objects.all())
+    current_time = datetime.datetime.now()
+    # ended_auctions = AuctionEvent.objects.filter(end_time__lt=current_time, item__status=AUCTION_ITEM_STATUS_RUNNING)
+
     print(User.objects.all())
     print('Request: {0!r}'.format(self.request))
 
@@ -39,8 +42,7 @@ def debug_task(self):
 # import hashlib
 
 # def process_ended_auctions():
-    # current_time = datetime.datetime.now()
-    # ended_auctions = AuctionEvent.objects.filter(end_time__lt=current_time, item__status=AUCTION_ITEM_STATUS_RUNNING)
+
     # for auction_event in ended_auctions:
         # process_ended_auction(auction_event)
 

@@ -1,13 +1,8 @@
 """ Application views """
 from django.views.generic.base import TemplateView
-from django.shortcuts import redirect, render_to_response
-from django.http import JsonResponse
-from django.contrib.auth import authenticate
 from django.views.generic.edit import FormView
 from django.conf import settings
 from boxer.forms import RegisterForm
-from boxer.models import Profile
-import base64
 
 class SputnikView(TemplateView):
     template_name = "landing.html"
@@ -36,23 +31,6 @@ class RegisterView(FormView):
     success_url = '/thanks/'
     def form_valid(self, form):
         return super(RegisterView, self).form_valid(form)
-
-def token(request):
-    if 'HTTP_AUTHORIZATION' in request.META:
-        auth = request.META['HTTP_AUTHORIZATION'].split()
-        if len(auth) == 2:
-            if auth[0].lower() == "basic":
-                username, password = base64.b64decode(auth[1]).split(':', 1)
-                user = authenticate(username=username, password=password)
-                if user is not None:# and user.is_staff:
-                    # handle your view here
-                    token = Profile.objects.get(user_ptr_id=user.id).token
-                    return JsonResponse({'Token': token})
-    # otherwise ask for authentification
-    response = JsonResponse({'Error': 'Invalid username or password'})
-    response.status_code = 401
-    response['WWW-Authenticate'] = 'Basic realm="restricted area"'
-    return response
 
 # import datetime
 # import hashlib

@@ -17,14 +17,15 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.generic import TemplateView, RedirectView
 from django.contrib import admin
-from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource
-from boxer.views import SputnikView, ThanksPageView, IndexView, RegisterView, token
+from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource, TokensResource
+from boxer.views import SputnikView, ThanksPageView, IndexView, RegisterView
 
 urlpatterns = [
     url(r'^$', SputnikView.as_view()),
     url(r'^dashboard/', admin.site.urls),
-    url(r'^authenticate/', token, name='authenticate'),
+    # url(r'^authenticate/', token, name='authenticate'),
     url(r'^thanks/', ThanksPageView.as_view(), name='advantages'),
+    url(r'^tokens/', TokensResource.as_detail(), name='tokens'),
     url(r'^deliveries/', include(DeliveryResource.urls()), name='deliveries'),
     url(r'^clients', include(ClientResource.urls()), name='clients'),
     url(r'^freighters', include(FreighterResource.urls()), name='freighters'),
