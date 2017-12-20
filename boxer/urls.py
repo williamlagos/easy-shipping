@@ -17,19 +17,33 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.generic import TemplateView, RedirectView
 from django.contrib import admin
-from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource, TokensResource
-from boxer.views import SputnikView, ThanksPageView, IndexView, RegisterView
+# from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource, TokensResource
+from rest_framework import routers
+from rest_framework.authtoken import views
+from boxer.views import *
+
+router = routers.DefaultRouter()
+router.register(r'users', UserViewSet)
+router.register(r'groups', GroupViewSet)
+router.register(r'profiles', ProfileViewSet)
+router.register(r'deliveries', DeliveryViewSet)
+router.register(r'offers', OfferViewSet)
+router.register(r'schedules', ScheduleViewSet)
+router.register(r'pictures', PictureViewSet)
 
 urlpatterns = [
     url(r'^$', SputnikView.as_view()),
     url(r'^dashboard/', admin.site.urls),
     # url(r'^authenticate/', token, name='authenticate'),
+    url(r'^api/', include(router.urls)),
+    url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api/auth/token/', views.obtain_auth_token),
     url(r'^thanks/', ThanksPageView.as_view(), name='advantages'),
-    url(r'^tokens/', TokensResource.as_detail(), name='tokens'),
-    url(r'^deliveries/', include(DeliveryResource.urls()), name='deliveries'),
-    url(r'^clients', include(ClientResource.urls()), name='clients'),
-    url(r'^freighters', include(FreighterResource.urls()), name='freighters'),
-    url(r'^schedules', include(ScheduleResource.urls()), name='schedules'),
+    # url(r'^tokens/', TokensResource.as_detail(), name='tokens'),
+    # url(r'^deliveries/', include(DeliveryResource.urls()), name='deliveries'),
+    # url(r'^clients', include(ClientResource.urls()), name='clients'),
+    # url(r'^freighters', include(FreighterResource.urls()), name='freighters'),
+    # url(r'^schedules', include(ScheduleResource.urls()), name='schedules'),
 
     # url(r'^register/$', RegisterView.as_view(), name='login'),
     # url(r'^signin/$', RedirectView.as_view(url="/"), name='signin'),
