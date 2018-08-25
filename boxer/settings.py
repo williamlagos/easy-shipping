@@ -31,10 +31,10 @@ DEBUG = True
 APP_NAME = "Frete Facil"
 
 INSTALLED_APPS = [
-    'dashboarder',
+    # 'dashboarder',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.admin',
+    # 'django.contrib.admin',
     'django.contrib.sessions',
     # Disable Django's own staticfiles handling in favour of WhiteNoise, for
     # greater consistency between gunicorn and `./manage.py runserver`. See:

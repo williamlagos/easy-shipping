@@ -33,7 +33,7 @@ router.register(r'pictures', PictureViewSet)
 
 urlpatterns = [
     url(r'^$', SputnikView.as_view()),
-    url(r'^dashboard/', admin.site.urls),
+    # url(r'^dashboard/', admin.site.urls),
     # url(r'^authenticate/', token, name='authenticate'),
     url(r'^api/', include(router.urls)),
     url(r'^api/auth/', include('rest_framework.urls', namespace='rest_framework')),
