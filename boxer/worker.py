@@ -19,7 +19,7 @@ import django
 django.setup()
 
 # Load task modeuls from all registered Django app configs.
-app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
+app.autodiscover_tasks()
 
 # import models
 from django.contrib.auth.models import User
