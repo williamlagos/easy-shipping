@@ -15,8 +15,10 @@ Including another URLconf
 """
 
 from django.conf.urls import url, include
+from django.conf.urls.static import static
 from django.views.generic import TemplateView, RedirectView
 from django.contrib import admin
+from django.conf import settings
 # from boxer.api import DeliveryResource, FreighterResource, ClientResource, ScheduleResource, OfferResource, PhotoResource, TokensResource
 from rest_framework import routers
 from rest_framework.authtoken import views
@@ -71,4 +73,4 @@ urlpatterns = [
     # url(r'^profile/user/(?P<user_id>\d+)/$', lebay_views.view_user_profile, name='lebay_view_user_profile'),
     # url(r'^profile/seller/create/$', lebay_views.edit_seller_profile, name='lebay_create_seller_profile'),
     # url(r'^profile/seller/edit/$', lebay_views.edit_seller_profile, name='lebay_edit_seller_profile'),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
