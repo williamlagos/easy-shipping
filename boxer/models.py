@@ -7,7 +7,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from localflavor.us.models import USStateField, PhoneNumberField
 
-from constants import AUCTION_ITEM_CATEGORY_CHOICES, AUCTION_ITEM_STATUS_CHOICES, AUCTION_ITEM_CATEGORY_GENERAL, AUCTION_ITEM_STATUS_IDLE, AUCTION_ITEM_CONDITION_CHOICES, AUCTION_EVENT_SHIPPING_CHOICES, SALES_PAYMENT_STATUS_CHOICES, SALES_PAYMENT_STATUS_PROCESSING, AUCTION_ITEM_STATUS_RUNNING, AUCTION_EVENT_SHIPPING_USPS
+# from constants import AUCTION_ITEM_CATEGORY_CHOICES, AUCTION_ITEM_STATUS_CHOICES, AUCTION_ITEM_CATEGORY_GENERAL, AUCTION_ITEM_STATUS_IDLE, AUCTION_ITEM_CONDITION_CHOICES, AUCTION_EVENT_SHIPPING_CHOICES, SALES_PAYMENT_STATUS_CHOICES, SALES_PAYMENT_STATUS_PROCESSING, AUCTION_ITEM_STATUS_RUNNING, AUCTION_EVENT_SHIPPING_USPS
 
 import datetime
 from django.db import models
@@ -46,11 +46,11 @@ class Profile(User):
         return u'%s %s' % (self.first_name, self.last_name)
 
     def is_seller(self):
-        try:
-            seller = self.seller
-            return True
-        except ObjectDoesNotExist, e:
-            return False
+        # try:
+        seller = self.seller
+        return True
+        # except ObjectDoesNotExist, e:
+            # return False
 
     @classmethod
     def generate_token(cls):
@@ -60,7 +60,7 @@ class Profile(User):
 
 class Delivery(BaseModel):
     """ Main delivery model """
-    freighter = models.ForeignKey(User, related_name="delivery_freighter", null=True)
+    freighter = models.ForeignKey(User, related_name="delivery_freighter", null=True, on_delete=models.CASCADE)
     departure_lat = models.FloatField(default=0.0)
     departure_lon = models.FloatField(default=0.0)
     arrival_lat = models.FloatField(default=0.0)
@@ -71,7 +71,7 @@ class Delivery(BaseModel):
     image = models.ImageField(max_length=128)
     title = models.CharField(max_length=128)
     description = models.TextField(default='', blank=True)
-    client = models.ForeignKey(User, related_name="delivery_client", null=True)
+    client = models.ForeignKey(User, related_name="delivery_client", null=True, on_delete=models.CASCADE)
     value = models.FloatField(default=0.0)
     in_auction = models.BooleanField(default=True)
     def __str__(self):
@@ -79,15 +79,15 @@ class Delivery(BaseModel):
 
 class Offer(BaseModel):
     # auction_event = models.ForeignKey(AuctionEvent, related_name='bids')
-    bidder = models.ForeignKey(User, related_name='offer_bidder')
-    delivery = models.ForeignKey(Delivery, related_name='offer_delivery')
+    bidder = models.ForeignKey(User, related_name='offer_bidder', on_delete=models.CASCADE)
+    delivery = models.ForeignKey(Delivery, related_name='offer_delivery', on_delete=models.CASCADE)
     amount = models.DecimalField(default=Decimal('0.00'), max_digits=5, decimal_places=2, help_text=u'All bids are final. Price in US dollars.')
 
     # def __unicode__(self):
         # return u'Placed on %s by %s' % (self.auction_event.item.title, self.bidder.username)
 
 class Schedule(BaseModel):
-    delivery = models.ForeignKey(Delivery, related_name='auction_events')
+    delivery = models.ForeignKey(Delivery, related_name='auction_events', on_delete=models.CASCADE)
     schedule_detail = models.CharField(max_length=100, blank=True)
     payment_detail = models.CharField(max_length=200, blank=True)
     start_time = models.DateTimeField(help_text=u'Format (Hour & Minute are optional): 10/25/2006 14:30')
@@ -151,8 +151,8 @@ class Schedule(BaseModel):
             return 'Unpaid'
 
 class Picture(BaseModel):
-    delivery = models.ForeignKey(Delivery, related_name='delivery')
-    owner = models.ForeignKey(User, related_name='picture')
+    delivery = models.ForeignKey(Delivery, related_name='delivery', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='picture', on_delete=models.CASCADE)
     image = models.ImageField()
 
     def __unicode__(self):
